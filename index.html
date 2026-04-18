@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Generator loterie QR - 108 coduri, 60 câștigători">
+<link rel="manifest" href="data:application/json,{
+  %22name%22:%22QR%20Lottery%20108%22,
+  %22short_name%22:%22QR108%22,
+  %22start_url%22:%22/%22,
+  %22display%22:%22standalone%22,
+  %22background_color%22:%22%230a0a0f%22,
+  %22theme_color%22:%22%230a0a0f%22,
+  %22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%230a0a0f'/%3E%3Crect x='20' y='20' width='60' height='60' rx='8' fill='none' stroke='%23c8ff00' stroke-width='8'/%3E%3Crect x='36' y='36' width='28' height='28' fill='%23c8ff00'/%3E%3Crect x='112' y='20' width='60' height='60' rx='8' fill='none' stroke='%23c8ff00' stroke-width='8'/%3E%3Crect x='128' y='36' width='28' height='28' fill='%23c8ff00'/%3E%3Crect x='20' y='112' width='60' height='60' rx='8' fill='none' stroke='%23c8ff00' stroke-width='8'/%3E%3Crect x='36' y='128' width='28' height='28' fill='%23c8ff00'/%3E%3Crect x='112' y='112' width='28' height='12' fill='%23c8ff00'/%3E%3Crect x='112' y='134' width='28' height='12' fill='%23c8ff00'/%3E%3Crect x='152' y='112' width='20' height='28' fill='%23c8ff00'/%3E%3Crect x='112' y='160' width='60' height='12' fill='%23c8ff00'/%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22}]}">
+<title>QR Lottery 108</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c27;
+    --border: #2a2a3a;
+    --accent: #c8ff00;
+    --accent2: #ff6b35;
+    --text: #f0f0f5;
+    --muted: #6b6b85;
+    --success: #00e5a0;
+    --danger: #ff4466;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ===== HOME ===== */
+  #screen-home { justify-content: center; align-items: center; padding: 2rem; position: relative; overflow: hidden; }
+  .bg-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px; opacity: 0.4;
+  }
+  .home-content { position: relative; z-index: 1; text-align: center; max-width: 380px; width: 100%; }
+  .logo-circle {
+    width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--accent);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; position: relative;
+  }
+  .logo-circle::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: var(--accent); opacity: 0.15; }
+  .logo-circle svg { width: 44px; height: 44px; }
+  .home-title { font-size: clamp(2.5rem, 10vw, 3.5rem); font-weight: 800; line-height: 1; margin-bottom: 0.5rem; }
+  .home-title span { color: var(--accent); }
+  .home-sub { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 3rem; letter-spacing: 2px; text-transform: uppercase; }
+  .btn-primary {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--accent); color: #0a0a0f; border: none;
+    padding: 1rem 2rem; border-radius: var(--radius);
+    font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; width: 100%; transition: transform 0.15s; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-secondary {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: transparent; color: var(--text); border: 1px solid var(--border);
+    padding: 0.875rem 2rem; border-radius: var(--radius);
+    font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; width: 100%; transition: background 0.15s; margin-top: 0.75rem;
+  }
+  .btn-secondary:active { background: var(--surface2); }
+  .install-hint {
+    margin-top: 2rem; font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    color: var(--muted); line-height: 1.8; padding: 1rem; border: 1px dashed var(--border); border-radius: 8px; text-align: left;
+  }
+  .install-hint strong { color: var(--accent); display: block; margin-bottom: 4px; }
+  .offline-badge {
+    display: inline-block; margin-top: 1rem;
+    background: rgba(0,229,160,0.1); border: 1px solid var(--success);
+    color: var(--success); border-radius: 40px; padding: 4px 12px;
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+  }
+
+  /* ===== SCAN ===== */
+  .scan-header {
+    display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border); background: var(--surface);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .btn-icon {
+    width: 40px; height: 40px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+  }
+  .btn-icon svg { width: 18px; height: 18px; stroke: var(--text); }
+  .scan-header-info { flex: 1; }
+  .scan-header-title { font-size: 1rem; font-weight: 700; }
+  .scan-header-sub { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+  .scan-counter { font-family: 'Space Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--accent); min-width: 64px; text-align: right; }
+
+  .camera-wrap {
+    position: relative; background: #000; overflow: hidden;
+    width: 100%; aspect-ratio: 4/3; max-height: 55vw;
+  }
+  #qr-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .scan-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+  .scan-frame { width: min(55%, 180px); aspect-ratio: 1; position: relative; }
+  .scan-frame::before, .scan-frame::after { content: ''; position: absolute; width: 28px; height: 28px; border-color: var(--accent); border-style: solid; }
+  .scan-frame::before { top: 0; left: 0; border-width: 3px 0 0 3px; }
+  .scan-frame::after { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
+  .sf-tr, .sf-bl { position: absolute; width: 28px; height: 28px; border-color: var(--accent); border-style: solid; }
+  .sf-tr { top: 0; right: 0; border-width: 3px 3px 0 0; }
+  .sf-bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; }
+  .scan-line { position: absolute; left: 5%; right: 5%; height: 2px; background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: scanAnim 2s ease-in-out infinite; opacity: 0.85; }
+  @keyframes scanAnim { 0%,100%{top:8%} 50%{top:88%} }
+
+  .camera-error {
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2rem; text-align: center; background: var(--bg);
+    width: 100%; aspect-ratio: 4/3; max-height: 55vw; border-bottom: 1px solid var(--border);
+  }
+  .camera-error svg { width: 36px; height: 36px; stroke: var(--muted); margin-bottom: 0.75rem; }
+  .camera-error p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+  .progress-bar-wrap { height: 3px; background: var(--surface2); }
+  .progress-bar-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+  .scan-feedback {
+    padding: 0.75rem 1.25rem; text-align: center;
+    font-family: 'Space Mono', monospace; font-size: 0.78rem;
+    min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .feedback-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: background 0.2s; }
+  .feedback-dot.ok { background: var(--success); animation: pop 0.4s ease; }
+  .feedback-dot.err { background: var(--danger); }
+  @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(2)} 100%{transform:scale(1)} }
+
+  .manual-row { padding: 0.75rem 1.25rem; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+  .manual-input {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 0.65rem 0.875rem; color: var(--text); font-family: 'Space Mono', monospace; font-size: 0.9rem; outline: none;
+  }
+  .manual-input:focus { border-color: var(--accent); }
+  .btn-add {
+    background: var(--surface2); border: 1px solid var(--accent); border-radius: 8px;
+    padding: 0 1rem; color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+  }
+
+  .scanned-list { flex: 1; overflow-y: auto; padding: 0.75rem 1.25rem; }
+  .list-title { font-size: 0.65rem; font-family: 'Space Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.75rem; }
+  .numbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; }
+  .num-chip {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 0.5rem 0.25rem; text-align: center;
+    font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--text);
+  }
+  .num-chip.fresh { background: rgba(200,255,0,0.12); border-color: var(--accent); color: var(--accent); animation: chipIn 0.35s ease; }
+  @keyframes chipIn { from{transform:scale(0.7);opacity:0} to{transform:scale(1);opacity:1} }
+
+  .scan-actions { padding: 1rem 1.25rem; border-top: 1px solid var(--border); background: var(--surface); display: flex; gap: 8px; }
+  .btn-clear { width: 44px; height: 44px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .btn-clear svg { width: 16px; height: 16px; stroke: var(--muted); }
+  .btn-generate {
+    flex: 1; background: var(--accent); color: #0a0a0f; border: none;
+    padding: 0.875rem; border-radius: var(--radius);
+    font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: transform 0.15s; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .btn-generate:active { transform: scale(0.97); }
+  .btn-generate:disabled { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); cursor: not-allowed; }
+
+  /* ===== RESULTS ===== */
+  #screen-results { overflow-y: auto; }
+  .results-header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 1rem 1.25rem; position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .results-title-area { flex: 1; }
+  .results-title { font-size: 1rem; font-weight: 800; }
+  .results-sub { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); }
+
+  .results-hero { padding: 2rem 1.25rem 1.5rem; text-align: center; border-bottom: 1px solid var(--border); }
+  .results-big { font-size: clamp(4rem, 18vw, 6rem); font-weight: 800; color: var(--accent); line-height: 1; }
+  .results-lbl { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
+
+  .results-meta { display: flex; gap: 8px; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+  .meta-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; text-align: center; }
+  .meta-val { font-family: 'Space Mono', monospace; font-size: 1.25rem; font-weight: 700; }
+  .meta-lbl { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .winners-wrap { padding: 1.25rem; }
+  .winners-title { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; }
+  .winners-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 8px; }
+  .winner-chip {
+    background: var(--surface); border: 1px solid rgba(200,255,0,0.25); border-radius: 10px;
+    padding: 0.75rem 0.25rem; text-align: center;
+    font-family: 'Space Mono', monospace; font-size: 1rem; font-weight: 700; color: var(--accent);
+    animation: winIn 0.4s ease both; position: relative;
+  }
+  .winner-chip::after { content: ''; position: absolute; inset: 0; background: var(--accent); opacity: 0.06; border-radius: 10px; }
+  @keyframes winIn { from{opacity:0;transform:scale(0.85) translateY(6px)} to{opacity:1;transform:none} }
+  .win-seq { display: block; font-size: 0.55rem; color: var(--muted); margin-top: 2px; font-weight: 400; }
+
+  .results-actions { padding: 1rem 1.25rem 3rem; display: grid; gap: 8px; }
+  .btn-pdf {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--accent2); color: #fff; border: none; padding: 1rem; border-radius: var(--radius);
+    font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: transform 0.15s; text-transform: uppercase;
+  }
+  .btn-pdf:active { transform: scale(0.97); }
+  .btn-new { display: flex; align-items: center; justify-content: center; gap: 10px; background: transparent; color: var(--text); border: 1px solid var(--border); padding: 0.875rem; border-radius: var(--radius); font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  .btn-new:active { background: var(--surface2); }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 40px;
+    padding: 0.6rem 1.25rem; font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--text);
+    z-index: 200; opacity: 0; transition: opacity 0.3s; white-space: nowrap; pointer-events: none; max-width: 90vw;
+  }
+  .toast.show { opacity: 1; }
+  .toast.ok { border-color: var(--success); color: var(--success); }
+  .toast.err { border-color: var(--danger); color: var(--danger); }
+
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="bg-grid"></div>
+  <div class="home-content">
+    <div class="logo-circle">
+      <svg viewBox="0 0 44 44" fill="none">
+        <rect x="4" y="4" width="14" height="14" rx="2" stroke="#c8ff00" stroke-width="2"/>
+        <rect x="7" y="7" width="8" height="8" fill="#c8ff00" opacity="0.6"/>
+        <rect x="26" y="4" width="14" height="14" rx="2" stroke="#c8ff00" stroke-width="2"/>
+        <rect x="29" y="7" width="8" height="8" fill="#c8ff00" opacity="0.6"/>
+        <rect x="4" y="26" width="14" height="14" rx="2" stroke="#c8ff00" stroke-width="2"/>
+        <rect x="7" y="29" width="8" height="8" fill="#c8ff00" opacity="0.6"/>
+        <rect x="26" y="26" width="8" height="3" fill="#c8ff00"/>
+        <rect x="26" y="32" width="8" height="3" fill="#c8ff00"/>
+        <rect x="37" y="26" width="3" height="8" fill="#c8ff00"/>
+        <rect x="26" y="38" width="14" height="3" fill="#c8ff00"/>
+      </svg>
+    </div>
+    <h1 class="home-title">QR<span>108</span></h1>
+    <p class="home-sub">Loterie QR &bull; 108 numere &bull; 60 câștigători</p>
+    <button class="btn-primary" onclick="startApp()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Pornește aplicația
+    </button>
+    <div class="install-hint">
+      <strong>📲 Instalare pe Android / iPhone</strong>
+      1. Deschide acest link în Chrome (Android) sau Safari (iPhone)<br>
+      2. Meniu browser → „Adaugă pe ecran principal"<br>
+      3. Funcționează offline după prima încărcare
+    </div>
+    <div class="offline-badge" id="sw-badge">⏳ Se verifică suportul offline...</div>
+  </div>
+</div>
+
+<!-- SCAN -->
+<div id="screen-scan" class="screen">
+  <div class="scan-header">
+    <div class="btn-icon" onclick="goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="scan-header-info">
+      <div class="scan-header-title">Scanare coduri QR</div>
+      <div class="scan-header-sub" id="scan-status">Pregătit</div>
+    </div>
+    <div class="scan-counter"><span id="scan-count">0</span>/108</div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="prog-bar" style="width:0%"></div>
+  </div>
+
+  <div class="camera-wrap" id="cam-wrap">
+    <video id="qr-video" autoplay playsinline muted></video>
+    <div class="scan-overlay">
+      <div class="scan-frame">
+        <div class="sf-tr"></div><div class="sf-bl"></div>
+        <div class="scan-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="camera-error" id="cam-error">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M1 1l22 22M17 11.5V11a2 2 0 00-2-2h-1.5l-5.5-5H5a2 2 0 00-2 2v12a2 2 0 002 2h9"/></svg>
+    <p>Camera indisponibilă.<br>Folosește introducerea manuală de mai jos.</p>
+  </div>
+
+  <div class="scan-feedback">
+    <div class="feedback-dot" id="fb-dot"></div>
+    <span id="fb-text">Îndreaptă camera spre un cod QR</span>
+  </div>
+
+  <div class="manual-row">
+    <input type="number" class="manual-input" id="manual-in" placeholder="Număr manual (1–108)" min="1" max="108">
+    <button class="btn-add" onclick="addManual()">+ ADAUGĂ</button>
+  </div>
+
+  <div class="scanned-list">
+    <div class="list-title">Numere scanate</div>
+    <div class="numbers-grid" id="num-grid"></div>
+  </div>
+
+  <div class="scan-actions">
+    <div class="btn-clear" onclick="clearAll()" title="Șterge tot">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+    </div>
+    <button class="btn-generate" id="btn-gen" onclick="generateWinners()" disabled>
+      GENEREAZĂ CÂȘTIGĂTORII
+    </button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="results-header">
+    <div class="btn-icon" onclick="showScreen('screen-scan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="results-title-area">
+      <div class="results-title">Rezultate Loterie</div>
+      <div class="results-sub" id="res-date"></div>
+    </div>
+  </div>
+
+  <div class="results-hero">
+    <div class="results-big">60</div>
+    <div class="results-lbl">numere câștigătoare extrase</div>
+  </div>
+
+  <div class="results-meta">
+    <div class="meta-card">
+      <div class="meta-val" id="m-total">108</div>
+      <div class="meta-lbl">Scanate</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-val" id="m-win">60</div>
+      <div class="meta-lbl">Câștigători</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-val" id="m-pct">55.6%</div>
+      <div class="meta-lbl">Rată câștig</div>
+    </div>
+  </div>
+
+  <div class="winners-wrap">
+    <div class="winners-title">Numerele câștigătoare — sortate crescător</div>
+    <div class="winners-grid" id="win-grid"></div>
+  </div>
+
+  <div class="results-actions">
+    <button class="btn-pdf" onclick="exportPDF()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      Descarcă / Printează PDF
+    </button>
+    <button class="btn-new" onclick="newLottery()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+      Loterire nouă
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+let scanned = new Set();
+let winners = [];
+let stream = null;
+let scanTimer = null;
+let lastVal = null;
+let cooldown = false;
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(() => {
+    document.getElementById('sw-badge').textContent = '✓ Funcționează offline';
+    document.getElementById('sw-badge').style.borderColor = '#00e5a0';
+    document.getElementById('sw-badge').style.color = '#00e5a0';
+    document.getElementById('sw-badge').style.background = 'rgba(0,229,160,0.08)';
+  }).catch(() => {
+    document.getElementById('sw-badge').textContent = '⚠ Necesită conexiune la internet';
+  });
+}
+
+// ===== NAV =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function startApp() { showScreen('screen-scan'); initCamera(); }
+function goHome() { stopCamera(); showScreen('screen-home'); }
+
+// ===== CAMERA =====
+async function initCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    const v = document.getElementById('qr-video');
+    v.srcObject = stream;
+    v.style.display = 'block';
+    document.getElementById('cam-wrap').style.display = 'block';
+    document.getElementById('cam-error').style.display = 'none';
+    v.addEventListener('loadedmetadata', () => startQR(v), { once: true });
+  } catch(e) {
+    document.getElementById('qr-video').style.display = 'none';
+    document.getElementById('cam-wrap').style.display = 'none';
+    document.getElementById('cam-error').style.display = 'flex';
+    setFeedback('Camera indisponibilă — introducere manuală activ', 'err');
+  }
+}
+
+function stopCamera() {
+  if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+}
+
+function startQR(video) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  scanTimer = setInterval(() => {
+    if (video.readyState < 2) return;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    try {
+      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
+      if (code && !cooldown) handleQR(code.data.trim());
+    } catch(e) {}
+  }, 200);
+}
+
+function handleQR(data) {
+  const n = parseInt(data, 10);
+  if (isNaN(n) || n < 1 || n > 108) {
+    if (data !== lastVal) { setFeedback(`QR invalid: "${data}"`, 'err'); lastVal = data; }
+    return;
+  }
+  if (scanned.has(n)) {
+    if (n !== lastVal) { setFeedback(`Nr. ${n} deja scanat`, 'err'); lastVal = n; }
+    return;
+  }
+  addNumber(n);
+  lastVal = n;
+  cooldown = true;
+  setTimeout(() => cooldown = false, 1500);
+}
+
+// ===== ADD =====
+function addNumber(n) {
+  scanned.add(n);
+  const chip = document.createElement('div');
+  chip.className = 'num-chip fresh';
+  chip.id = 'c' + n;
+  chip.textContent = n;
+  document.getElementById('num-grid').appendChild(chip);
+  setTimeout(() => chip.classList.remove('fresh'), 500);
+  chip.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  updateCounter();
+  setFeedback(`✓ Numărul ${n} adăugat`, 'ok');
+  toast(`Nr. ${n} scanat`, 'ok');
+}
+
+function addManual() {
+  const inp = document.getElementById('manual-in');
+  const n = parseInt(inp.value, 10);
+  if (isNaN(n) || n < 1 || n > 108) { toast('Număr invalid (1–108)', 'err'); return; }
+  if (scanned.has(n)) { toast(`Nr. ${n} există deja`, 'err'); inp.value = ''; return; }
+  addNumber(n);
+  inp.value = '';
+  inp.focus();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('manual-in').addEventListener('keydown', e => { if (e.key === 'Enter') addManual(); });
+});
+
+function updateCounter() {
+  const c = scanned.size;
+  document.getElementById('scan-count').textContent = c;
+  document.getElementById('prog-bar').style.width = (c / 108 * 100) + '%';
+  document.getElementById('btn-gen').disabled = c < 1;
+  document.getElementById('scan-status').textContent = c === 108 ? 'Toate 108 scanate!' : `${108 - c} rămase`;
+}
+
+function clearAll() {
+  if (!scanned.size) return;
+  if (!confirm(`Ștergi toate cele ${scanned.size} numere scanate?`)) return;
+  scanned.clear(); lastVal = null;
+  document.getElementById('num-grid').innerHTML = '';
+  updateCounter();
+  setFeedback('Listă resetată', 'err');
+}
+
+// ===== GENERATE =====
+function generateWinners() {
+  stopCamera();
+  const pool = Array.from(scanned);
+  const count = Math.min(60, pool.length);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  winners = pool.slice(0, count).sort((a, b) => a - b);
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ro-RO') + ' ' + now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+
+  document.getElementById('res-date').textContent = dateStr;
+  document.getElementById('m-total').textContent = scanned.size;
+  document.getElementById('m-win').textContent = count;
+  document.getElementById('m-pct').textContent = (count / scanned.size * 100).toFixed(1) + '%';
+
+  const grid = document.getElementById('win-grid');
+  grid.innerHTML = '';
+  winners.forEach((n, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'winner-chip';
+    chip.style.animationDelay = (i * 0.025) + 's';
+    chip.innerHTML = `${n}<span class="win-seq">#${i + 1}</span>`;
+    grid.appendChild(chip);
+  });
+
+  showScreen('screen-results');
+}
+
+// ===== PDF EXPORT =====
+function exportPDF() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ro-RO') + ' ' + now.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
+  const rows = [];
+  for (let i = 0; i < winners.length; i += 6) rows.push(winners.slice(i, i + 6));
+
+  const html = `<!DOCTYPE html><html lang="ro"><head><meta charset="UTF-8">
+<title>QR Lottery 108 — Rezultate ${dateStr}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;color:#111;padding:28px;max-width:820px;margin:0 auto}
+h1{font-size:24px;font-weight:900;margin-bottom:4px}
+.sub{color:#777;font-size:12px;margin-bottom:20px}
+.stats{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.stat{background:#f4f4f4;border-radius:8px;padding:10px 18px;text-align:center;min-width:100px}
+.sv{font-size:20px;font-weight:700}
+.sl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+h2{font-size:14px;margin-bottom:10px;color:#333;text-transform:uppercase;letter-spacing:1px}
+table{border-collapse:collapse;width:100%}
+td{border:1px solid #ddd;padding:10px;text-align:center;font-size:20px;font-weight:700;width:60px}
+.footer{margin-top:20px;font-size:10px;color:#bbb;border-top:1px solid #eee;padding-top:10px}
+@media print{body{padding:15px}button{display:none!important}.no-print{display:none}}
+</style></head><body>
+<h1>🎰 QR Lottery 108 — Rezultate oficiale</h1>
+<div class="sub">Data: ${dateStr} &nbsp;|&nbsp; Algoritm: Fisher-Yates Shuffle</div>
+<div class="stats">
+  <div class="stat"><div class="sv">${scanned.size}</div><div class="sl">Numere scanate</div></div>
+  <div class="stat"><div class="sv">${winners.length}</div><div class="sl">Câștigători</div></div>
+  <div class="stat"><div class="sv">${(winners.length / scanned.size * 100).toFixed(1)}%</div><div class="sl">Rată câștig</div></div>
+</div>
+<h2>Numerele câștigătoare (${winners.length}) — sortate crescător</h2>
+<table>${rows.map(r => `<tr>${r.map(n => `<td>${n}</td>`).join('')}</tr>`).join('')}</table>
+<div class="footer">QR Lottery 108 &bull; ${dateStr}</div>
+<br><button class="no-print" onclick="window.print()" style="padding:10px 24px;background:#ff6b35;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:700">🖨 Printează / Salvează PDF</button>
+</body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `loterie-${now.toISOString().slice(0,10)}.html`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('Fișier descărcat! Deschide-l și apasă „Printează"', 'ok');
+}
+
+// ===== NEW =====
+function newLottery() {
+  if (!confirm('Începi o loterire nouă? Rezultatele se vor pierde.')) return;
+  scanned.clear(); winners = []; lastVal = null;
+  document.getElementById('num-grid').innerHTML = '';
+  document.getElementById('win-grid').innerHTML = '';
+  updateCounter();
+  showScreen('screen-scan');
+  initCamera();
+}
+
+// ===== UI HELPERS =====
+function setFeedback(text, type) {
+  document.getElementById('fb-text').textContent = text;
+  const d = document.getElementById('fb-dot');
+  d.className = 'feedback-dot' + (type ? ' ' + type : '');
+}
+let toastT;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+</body>
+</html>
