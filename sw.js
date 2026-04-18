@@ -1,7 +1,7 @@
 const CACHE = 'qr-lottery-v1';
 const ASSETS = [
-  '/',
-  '/index.html',
+  './',
+  './index.html',
   'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js',
   'https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap'
 ];
