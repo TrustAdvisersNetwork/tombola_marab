@@ -11,7 +11,7 @@
 <link rel="manifest" href="data:application/json,{
   %22name%22:%22QR%20Lottery%20108%22,
   %22short_name%22:%22QR108%22,
-  %22start_url%22:%22/%22,
+  %22start_url%22:%22.%2F%22,%22scope%22:%22.%2F%22,
   %22display%22:%22standalone%22,
   %22background_color%22:%22%230a0a0f%22,
   %22theme_color%22:%22%230a0a0f%22,
@@ -386,16 +386,11 @@ let lastVal = null;
 let cooldown = false;
 
 // ===== SERVICE WORKER =====
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(() => {
-    document.getElementById('sw-badge').textContent = '✓ Funcționează offline';
-    document.getElementById('sw-badge').style.borderColor = '#00e5a0';
-    document.getElementById('sw-badge').style.color = '#00e5a0';
-    document.getElementById('sw-badge').style.background = 'rgba(0,229,160,0.08)';
-  }).catch(() => {
-    document.getElementById('sw-badge').textContent = '⚠ Necesită conexiune la internet';
-  });
-}
+// No service worker needed - app works from browser cache
+document.getElementById('sw-badge').textContent = '✓ Aplicație instalabilă pe ecran principal';
+document.getElementById('sw-badge').style.borderColor = '#00e5a0';
+document.getElementById('sw-badge').style.color = '#00e5a0';
+document.getElementById('sw-badge').style.background = 'rgba(0,229,160,0.08)';
 
 // ===== NAV =====
 function showScreen(id) {
